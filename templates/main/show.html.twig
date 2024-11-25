@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Figure{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <!-- Image principale -->
+            <div class="col-md-8 text-center">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mb-4">{{trick.name}}</h1>
+                    <div>
+                        <a href="/modifier" class="btn btn-warning btn-sm me-2">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="/supprimer" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                <div id="main-image-container" class="mb-4">
+                    <!-- Image principale -->
+                    {% if trick.media|length > 0 %}
+                        {% set main_media = trick.media|first %}
+                        {% if main_media.type == 'image' %}
+                            <img id="main-image" src="{{ asset(main_media.url) }}" class="img-fluid rounded" alt="Image principale de la figure">
+                        {% elseif main_media.type == 'video' %}
+                            <iframe id="main-video" src="{{ main_media.url }}" class="img-fluid rounded" allowfullscreen></iframe>
+                        {% endif %}
+                    {% else %}
+                        <img id="main-image" src="/images/header-trick.jpg" class="img-fluid rounded" alt="Image principale de la figure">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Miniatures -->
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    {% for media in trick.media %}
+                        {% if media.type == 'image' %}
+                            <div class="media-card">
+                                <img src="{{ asset(media.url) }}" class="card-img" alt="Miniature {{ loop.index }}" onclick="changeMainImage('{{ asset(media.url) }}')">
+                            </div>
+                        {% elseif media.type == 'video' %}
+                            <div class="media-card">
+                                <iframe src="{{ media.url }}" class="card-video" allowfullscreen onclick="changeMainVideo('{{ media.url }}')"></iframe>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8 text-center">
+                <p>{{trick.content}}</p>
+            </div>
+        </div>
+
+        <!-- Liste horizontale -->
+        <div class="row justify-content-center">
+           <ul class="d-flex justify-content-between list-unstyled">
+                <li class="list-item">Créé le : {{ trick.createdAt|date('d/m/Y') }}</li>
+                <li class="list-item">Modifié le : {{ trick.updatedAt|date('d/m/Y') }}</li>
+                <li class="list-item">Catégorie : {{ trick.category.name }}</li>  <!-- Assurez-vous d'afficher le nom de la catégorie -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function changeMainImage(imagePath) {
+            document.getElementById('main-image').src = imagePath;
+            document.getElementById('main-image').style.display = 'block';
+            document.getElementById('main-video').style.display = 'none';
+        }
+
+        function changeMainVideo(videoPath) {
+            document.getElementById('main-video').src = videoPath;
+            document.getElementById('main-video').style.display = 'block';
+            document.getElementById('main-image').style.display = 'none';
+        }
+    </script>
+{% endblock %}
